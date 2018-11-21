@@ -1,1 +1,1 @@
-# Pi--Transparence-des-algorithmes
+# Pi²-Transparence-des-algorithmes
