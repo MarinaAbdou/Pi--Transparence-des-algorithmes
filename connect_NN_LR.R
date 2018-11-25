@@ -14,6 +14,16 @@ y_pred_LR <- py$y_pred
 
 #Pour connecter R et Python quand il y a des graphes sur Python il y a une erreur dûe à Qt pluggin window... donc le code du plot en python a été commenté
 
-plot(py$fpr,py$tpr,xlab="False Positive Rate", ylab="True Positive Rate",cex=.5,col="red")
-lines(c(py$fpr),c(py$tpr),type="s",col="red")
-abline(0,1)
+graph <- function(name)
+{
+  if(name=="ROC")
+  {
+    ROCgraph <- plot(py$fpr_keras,py$tpr_keras,main="ROC curve", xlab="False Positive Rate", ylab="True Positive Rate",cex=.5,col="red", type ="s")
+    lines(c(py$fpr),c(py$tpr),type="s",col="blue")
+    abline(0,1)
+    legend("topleft", legend=c("Neural Networks", "Logistic Regression"),
+           col=c("red", "blue"), lty=1:1, cex=0.8)
+  }
+}
+
+
