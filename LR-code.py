@@ -11,7 +11,6 @@ from sklearn import preprocessing
 #plt.rc("font", size=14)
 from sklearn.linear_model import LogisticRegression
 from sklearn import metrics
-from sklearn.cross_validation import train_test_split
 import seaborn as sns
 sns.set(style="white")
 sns.set(style="whitegrid", color_codes=True)
@@ -20,38 +19,40 @@ sns.set(style="whitegrid", color_codes=True)
 # In[4]:
 
 
-data=pd.read_csv('clean_train.csv', header=0)
-data=data.dropna()
-print(data.shape)  #Array dimensions 
-print(list(data.columns))
+train=pd.read_csv('sample_train.csv', header=0)
+train=train.dropna()
+print(train.shape)  #Array dimensions 
+print(list(train.columns))
 
+test=pd.read_csv('sample_test.csv', header=0)
+test=test.dropna()
+print(test.shape)  #Array dimensions 
+print(list(test.columns))
 
 # In[5]:
 
 
-data.head()
+train.head()
 
 
 # In[15]:
 
 
-traindim=2000
-testdim=500
-x=data.iloc[:,:-1] #We use iloc because the array indexes are numeric. We select ALL the rows ALL and the columns exceptes the last one 'Target'
+#We use iloc because the array indexes are numeric. We select ALL the rows ALL and the columns exceptes the last one 'Target'
 #print(x)
-y=data.iloc[:,-1] #We select ALL the rows and the last one column 'Target'
+ #We select ALL the rows and the last one column 'Target'
 #print(y)
 
 #We prepare the train set
-x_train=x.iloc[:traindim,:] #We select the 2000 first rows (without the column Target of course)
+x_train=train.iloc[:,:-1] #We select the 2000 first rows (without the column Target of course)
 #print(x_train)
-y_train = y.iloc[:traindim] #We select the 2000 first rows of Target
+y_train = train.iloc[:,-1] #We select the 2000 first rows of Target
 #print(y_train)
 
 #We prepare the test set
-x_test = x.iloc[-testdim:,:] #we remove ???
+x_test = test.iloc[:,:-1] #we remove ???
 #print(x_test)
-y_test = y.iloc[-testdim:] #we remove ???
+y_test = test.iloc[:,-1] #we remove ???
 print(y_test)
 
 
@@ -81,8 +82,11 @@ print('Accuracy of logistic regression classifier on test set: {:.2f}'.format(lo
 
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
-logit_roc_auc = roc_auc_score(y_test, logreg.predict(x_test))
+logit_roc_auc = roc_auc_score(y_test, y_pred)
 fpr, tpr, thresholds = roc_curve(y_test, logreg.predict_proba(x_test)[:,1])
+from sklearn.metrics import auc
+auc = auc(fpr, tpr)
+print('Test accuracy:', auc)
 #plt.figure()
 #plt.plot(fpr, tpr, label='Logistic Regression (area = %0.2f)' % logit_roc_auc)
 #plt.plot([0, 1], [0, 1],'r--')
