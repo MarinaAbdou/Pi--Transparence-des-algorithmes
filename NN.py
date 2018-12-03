@@ -6,8 +6,8 @@ from keras import backend as K
 from tensorflow import metrics
 
 #path = '/Users/alessandrobusato/Desktop/ESILV/Project/Code/train.csv'
-trainpath = 'sample_train.csv'
-testpath = 'sample_test.csv'
+trainpath = 'train_features.csv'
+testpath = 'test_features.csv'
 train = pd.read_csv(trainpath, header=0)
 test = pd.read_csv(testpath, header=0)
 train = train.values

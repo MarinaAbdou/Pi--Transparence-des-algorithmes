@@ -19,12 +19,12 @@ sns.set(style="whitegrid", color_codes=True)
 # In[4]:
 
 
-train=pd.read_csv('sample_train.csv', header=0)
+train=pd.read_csv('train_features.csv', header=0)
 train=train.dropna()
 print(train.shape)  #Array dimensions 
 print(list(train.columns))
 
-test=pd.read_csv('sample_test.csv', header=0)
+test=pd.read_csv('test_features.csv', header=0)
 test=test.dropna()
 print(test.shape)  #Array dimensions 
 print(list(test.columns))
