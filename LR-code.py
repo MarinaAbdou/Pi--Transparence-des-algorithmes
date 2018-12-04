@@ -21,13 +21,13 @@ sns.set(style="whitegrid", color_codes=True)
 
 train=pd.read_csv('train_features.csv', header=0)
 train=train.dropna()
-print(train.shape)  #Array dimensions 
-print(list(train.columns))
+#print(train.shape)  #Array dimensions 
+#print(list(train.columns))
 
 test=pd.read_csv('test_features.csv', header=0)
 test=test.dropna()
-print(test.shape)  #Array dimensions 
-print(list(test.columns))
+#print(test.shape)  #Array dimensions 
+#print(list(test.columns))
 
 # In[5]:
 
@@ -53,7 +53,7 @@ y_train = train.iloc[:,-1] #We select the 2000 first rows of Target
 x_test = test.iloc[:,:-1] #we remove ???
 #print(x_test)
 y_test = test.iloc[:,-1] #we remove ???
-print(y_test)
+#print(y_test)
 
 
 # In[18]:
