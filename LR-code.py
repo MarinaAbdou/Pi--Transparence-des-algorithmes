@@ -83,7 +83,8 @@ print('Accuracy of logistic regression classifier on test set: {:.2f}'.format(lo
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import roc_curve
 logit_roc_auc = roc_auc_score(y_test, y_pred)
-fpr, tpr, thresholds = roc_curve(y_test, logreg.predict_proba(x_test)[:,1])
+y_pred_lr=logreg.predict_proba(x_test)[:,1]
+fpr, tpr, thresholds = roc_curve(y_test,y_pred_lr)
 from sklearn.metrics import auc
 auc = auc(fpr, tpr)
 print('Test accuracy:', auc)
