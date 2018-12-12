@@ -3,6 +3,7 @@ library(BBmisc)
 library(fBasics)
 library(tidyverse)
 library(caret)
+library(reticulate)
 
 randomSample <- function(x,perc){
   nobs=nrow(x)
@@ -18,29 +19,37 @@ normalize <- function(x) {
 ui <- fluidPage(
   numericInput("noise", "noise",0,min=0,max=3,step=1),
   numericInput("dataPerc", "dataPerc",50,min=25,max=100,step=25),
+  numericInput("varPerc", "varPerc", 50, min=10, max=100,step=10),
   actionButton("go","go"),
   
   textOutput("t")
 )
 
 server <- function(input, output){
-  path <- "/Users/user/Desktop/Pi2"
+  path <- "/Users/alessandrobusato/Desktop/ESILV/Project/Pi2-Transparence-des-algorithmes-master"
   setwd(path)
   Train <- read.csv("sample_train.csv", header=TRUE)
   Test <- read.csv("sample_test.csv", header=TRUE)
   NData <- rbind(Train,Test)
   NData <- as.data.frame(lapply(NData, normalize))
+  cor=abs(cor(NData[,1:(length(Train)-1)],NData[,length(Train)]))
+  ordCor=order(cor,decreasing=TRUE)
   rangetrain<-1:nrow(Train)
   NTrain <- NData[rangetrain,]
   NTest <- NData[-rangetrain,]
+  if (file.exists("results_history.csv")){
+    file.remove("results_history.csv")
+  }
+  file.create("results_history.csv")
   
   
-  v<- reactiveValues(noise = NULL,dataPerc=NULL, NTrain=NULL, NTest=NULL)
+  v<- reactiveValues(noise = NULL,dataPerc=NULL,varPerc=NULL, NTrain=NULL, NTest=NULL)
   
 
   observeEvent(input$go, {
     v$noise <- input$noise
     v$dataPerc<- input$dataPerc/100
+    v$varPerc<- input$varPerc/100
     v$NTrain<-  NTrain
     v$NTest<-  NTest
     
@@ -75,12 +84,21 @@ server <- function(input, output){
     }
     
     v$NTrain <- randomSample(v$NTrain,v$dataPerc)
+    
+    nvar <- as.integer((length(NTrain)-1)*v$varPerc)
+    tar <- c(ordCor[1:nvar],length(NTrain))
+    v$NTrain <- v$NTrain[tar]
+    v$NTest <- v$NTest[tar]
+    
     write.csv(v$NTrain[1:length(v$NTrain[,1]),],file="train_features.csv", row.names = FALSE)
     write.csv(v$NTest[1:length(v$NTest[,1]),],file="test_features.csv", row.names = FALSE)
-    
-    
-    
-    
+    py_run_file("NN.py")
+    nn_pred <- py$y_pred_nn
+    py_run_file("LR-code.py")
+    lr_pred <- py$y_pred_lr
+    results <- rbind(nn_pred,lr_pred)
+    write.csv(results[1:length(results[,1]),],file="results.csv", row.names = FALSE)
+    write.table(results, file = "results_history.csv", sep = ",", append = TRUE, quote = FALSE, col.names = FALSE, row.names = FALSE)
   })
   
   
