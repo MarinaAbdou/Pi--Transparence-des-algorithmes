@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow import keras
+import keras
 import pandas as pd
 import numpy as np
 from keras import backend as K
