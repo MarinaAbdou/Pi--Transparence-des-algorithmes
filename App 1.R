@@ -93,7 +93,7 @@ server <- function(input, output){
     write.csv(v$NTrain[1:length(v$NTrain[,1]),],file="train_features.csv", row.names = FALSE)
     write.csv(v$NTest[1:length(v$NTest[,1]),],file="test_features.csv", row.names = FALSE)
     py_run_file("NN.py")
-    nn_pred <- py$y_pred_nn
+    nn_pred <- py$y_pred_keras
     py_run_file("LR-code.py")
     lr_pred <- py$y_pred_lr
     results <- rbind(nn_pred,lr_pred)
