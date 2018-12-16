@@ -26,7 +26,7 @@ ui <- fluidPage(
 )
 
 server <- function(input, output){
-  path <- "/Users/alessandrobusato/Desktop/ESILV/Project/Pi2-Transparence-des-algorithmes-master"
+  path <- "C:/Users/Marina/Documents/Semestre 9 (2018-2019)/Pi²/Pi2-Transparence-des-algorithmes-master"
   setwd(path)
   Train <- read.csv("sample_train.csv", header=TRUE)
   Test <- read.csv("sample_test.csv", header=TRUE)
@@ -43,7 +43,7 @@ server <- function(input, output){
   file.create("results_history.csv")
   
   
-  v<- reactiveValues(noise = NULL,dataPerc=NULL,varPerc=NULL, NTrain=NULL, NTest=NULL)
+  v<- reactiveValues(noise = NULL,dataPerc=NULL,varPerc=NULL, NTrain=NULL, NTest=NULL, outputText = NULL, c = 0)
   
 
   observeEvent(input$go, {
@@ -52,6 +52,8 @@ server <- function(input, output){
     v$varPerc<- input$varPerc/100
     v$NTrain<-  NTrain
     v$NTest<-  NTest
+    v$c <- v$c + 1
+    v$outputText <- paste("The result of the simulation ", v$c, " were saved in result.csv, for more results please check result_history.csv. You may now use our APP2 to compare algorithms performances.")
     
     if (v$noise==0) {
       v$NTrain <- NTrain
@@ -93,7 +95,7 @@ server <- function(input, output){
     write.csv(v$NTrain[1:length(v$NTrain[,1]),],file="train_features.csv", row.names = FALSE)
     write.csv(v$NTest[1:length(v$NTest[,1]),],file="test_features.csv", row.names = FALSE)
     py_run_file("NN.py")
-    nn_pred <- py$y_pred_nn
+    nn_pred <- py$y_pred_keras
     py_run_file("LR-code.py")
     lr_pred <- py$y_pred_lr
     results <- rbind(nn_pred,lr_pred)
@@ -103,7 +105,7 @@ server <- function(input, output){
   
   
   output$t <- renderText({
-    print(paste(v$noise,v$dataPerc))
+    print(v$outputText)
   })
 }
 
