@@ -66,7 +66,8 @@ ui <- fluidPage(
 #buttons to change the main graph:  
   actionButton("graph1","histogram1"),
   actionButton("graph2","histogram2"),
-  actionButton("circle", "Circle graph"),
+  actionButton("pieChart1", "Neural Network : True Predictions VS Wrong Predictions"),
+  actionButton("pieChart2", "Logistic Regression : True Predictions VS Wrong Predictions"),
 
  
 #output variable that rapresent the main graph:
@@ -94,7 +95,7 @@ ui <- fluidPage(
 
 server <- function(input, output){
   # setting of directory
-  path <- "/Users/user/Desktop/Pi2"
+  path <- "C:/Users/Marina/Documents/Semestre 9 (2018-2019)/Pi²/Pi2-Transparence-des-algorithmes-master"
   setwd(path)
   
   # import the data: sample_test(the same that we use for app1)
@@ -112,8 +113,17 @@ server <- function(input, output){
   PREDICTION[PREDICTION<0.5]=0
   PREDICTION[PREDICTION>=0.5]=1
   
-  #create table for good/wrong predictions
   
+  #create table for good/wrong predictions  
+  GW_glob = data.frame()
+  for(i in 1:nSim){
+    if(i==1){
+      GW_glob <- rbind(GW_glob,GoodWrong(TEST["TARGET"],PREDICTION[2*i-1],PREDICTION[2*i]))
+    }else{
+      GW_glob <- cbind(GW_glob,GoodWrong(TEST["TARGET"],PREDICTION[2*i-1],PREDICTION[2*i]))
+    }
+    
+  }
   
   #fake Trainfeat and infoSimof 2 simulation
   trainFeat=data.frame("Level Of Noise"=c(1,0),
@@ -131,6 +141,7 @@ server <- function(input, output){
                      indSubset=c(1:length(TEST[,1])),  
                      v1 = 0,v2=0, v3=c(0,33),v4=c(0,18),v5=0
                      )
+
   
   output$N_Sim = renderText(
     print(paste("Sim. N.",v$idSim))
@@ -145,7 +156,8 @@ server <- function(input, output){
   )
   
   output$GW=renderTable(
-    GoodWrong(TEST["TARGET"],PREDICTION[v$idSim*2-1],PREDICTION[v$idSim*2])
+    #GoodWrong(TEST["TARGET"],PREDICTION[v$idSim*2-1],PREDICTION[v$idSim*2])
+    GW_glob[(v$idSim*5-4):(v$idSim*5)]
   )
   
   output$GWsubset=renderTable(
@@ -209,6 +221,22 @@ server <- function(input, output){
   observeEvent(input$graph2, {
     output$graph=renderPlot(
       hist(v$simSelected[v$indSubset,"M2"])
+    )
+  })
+  observeEvent(input$pieChart1, {
+    output$graph=renderPlot(
+      pie(as.numeric(c(GW_glob[v$idSim*5-2], 1.00 - GW_glob[v$idSim*5-2])), 
+          labels =c(paste("True Predictions for Neural Networks : ",round(GW_glob[v$idSim*5-2]*100,1),"%"),paste("Wrong Predictions for Neural Networks : ", round((1.00 - GW_glob[v$idSim*5-2])*100,1),"%")),
+          main = "Neural Network : True Predictions VS Wrong Predictions", 
+          col = c("#336699","#FFFFFF"))
+      )
+  })
+  observeEvent(input$pieChart2, {
+    output$graph=renderPlot(
+      pie(as.numeric(c(GW_glob[v$idSim*5-1], 1.00 - GW_glob[v$idSim*5-1])), 
+          labels =c(paste("True Predictions for Logistic Regression : ",round(GW_glob[v$idSim*5-1]*100,1),"%"),paste("Wrong Predictions for Logistic Regression : ", round((1.00 - GW_glob[v$idSim*5-1])*100,1),"%")),
+          main = "Logistic Regression : True Predictions VS Wrong Predictions", 
+          col = c("#336699","#FFFFFF"))
     )
   })
   
