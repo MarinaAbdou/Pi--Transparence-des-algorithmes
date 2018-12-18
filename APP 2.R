@@ -50,47 +50,84 @@ GoodWrong <- function(Tar,P1,P2){
 
 ui <- fluidPage(
   
+  # App title ----
+  titlePanel("Title ?"),
   
-# output varariables that represent generic info: n if simulation, train features, time/prec 
-  textOutput("N_Sim"),
-  tableOutput("InfoSim"),  
-  tableOutput("PrecTime"),
-  tableOutput("GW"),
+  hr(),
   
+  fluidRow(
+    column(1,
+           #n if simulation
+           h4(textOutput("N_Sim"))),
+    
+    #buttons for next and prev simulation
+    column(1,
+           actionButton("Prev","Previous Simulation")),
+    
+    column(1,
+           actionButton("Next","Next Simulation"))
+  ),
   
-#buttons for next and prev simulation
-  actionButton("Next","Next Simulation"),
-  actionButton("Prev","Prev Simulation"),
+  hr(),
   
+  # output varariables that represent generic info: train features, time/prec 
+  h4("Generic Info :"),
   
-#buttons to change the main graph:  
-  actionButton("graph1","histogram1"),
-  actionButton("graph2","histogram2"),
-  actionButton("pieChart1", "Neural Network : True Predictions VS Wrong Predictions"),
-  actionButton("pieChart2", "Logistic Regression : True Predictions VS Wrong Predictions"),
-
- 
-#output variable that rapresent the main graph:
-  plotOutput("graph"),
+  fluidRow(
+    column(3,
+           tableOutput("InfoSim")),
+    
+    column(2,
+           tableOutput("PrecTime")),
+    
+    column(6,
+           tableOutput("GW"))
+  ),
   
-#text in wich we represent nof obs, n of good prediction for both models, only one of them, no one
-  textOutput("SubsetInfo"),
+  hr(),
   
- 
- # button to apply or not to apply the filter
-  actionButton("nf","No filter"),
-  actionButton("af","Apply filter"),
-
-#  input to select the subset when we press apply filter
-  numericInput("ind_var30", "ind_var30: select a value",0,min=0,max=1,step=1),
-  numericInput("num_meses_var5_ult3", "num_meses_var5_ult3: select a value",0,min=0,max=3,step=1),
-  sliderInput("num_var30", "num_var30: select a range", min = 0, 
-              max = 33, value = c(0, 33)),
-  sliderInput("num_var42", "num_var42: select a range", min = 0, 
-              max = 18, value = c(0, 18)),
-  numericInput("ind_var5", "ind_var5: select a value",0,min=0,max=1,step=1),
+  h4("Select your subset :"),
   
-  tableOutput("GWsubset")
+  fluidRow(
+    column(2,
+           numericInput("ind_var30", "ind_var30: select a value",0,min=0,max=1,step=1)),
+    
+    column(2,
+           numericInput("num_meses_var5_ult3", "num_meses_var5_ult3: select a value",0,min=0,max=3,step=1)),
+    
+    column(2,
+           sliderInput("num_var30", "num_var30: select a range", min = 0, 
+                       max = 33, value = c(0, 33))),
+    
+    column(2,
+           sliderInput("num_var42", "num_var42: select a range", min = 0, 
+                       max = 18, value = c(0, 18))),
+    
+    column(2,
+           numericInput("ind_var5", "ind_var5: select a value",0,min=0,max=1,step=1)),
+    
+    # button to apply or not to apply the filter
+    column(1,
+           actionButton("nf","No filter")),
+    
+    column(1,
+           actionButton("af","Apply filter"))
+  ),
+  
+  hr(),
+  
+  fluidRow(
+    column(5,
+           h4("Select a graph :"),
+           selectInput("N", "", c("Default","histo1", "histo2", "Classification Pie Chart", "ROC Curve")),
+           plotOutput("graph")),
+    
+    column(6,
+           #text in wich we represent nof obs, n of good prediction for both models, only one of them, no one
+           h4(textOutput("SubsetInfo")),
+           
+           tableOutput("GWsubset"))
+  )
 )
 
 server <- function(input, output){
@@ -134,7 +171,7 @@ server <- function(input, output){
   colnames(precTime)=c("NN","LR","NN","LR")
   
   
-  
+  graphName <- reactive(as.character(input$N))
   
   v<- reactiveValues(simSelected=data.frame(TEST,RESULTS[1:2]),
                      idSim=1, 
@@ -144,7 +181,7 @@ server <- function(input, output){
 
   
   output$N_Sim = renderText(
-    print(paste("Sim. N.",v$idSim))
+    print(paste("Simulation ",v$idSim))
   )
   
   output$InfoSim=renderTable(
@@ -156,7 +193,6 @@ server <- function(input, output){
   )
   
   output$GW=renderTable(
-    #GoodWrong(TEST["TARGET"],PREDICTION[v$idSim*2-1],PREDICTION[v$idSim*2])
     GW_glob[(v$idSim*5-4):(v$idSim*5)]
   )
   
@@ -211,33 +247,34 @@ server <- function(input, output){
   
   
   output$SubsetInfo=renderText(
-    print(paste("SUBSET INFO: n. of obs= ",length(v$indSubset)))
+    print(paste("Subset Info : Number of observations = ",length(v$indSubset)))
   )
-  observeEvent(input$graph1, {
-    output$graph=renderPlot(
+  
+  
+  output$graph <- renderPlot({
+    
+    if(graphName()=="histo1"){
       hist(v$simSelected[v$indSubset,"M1"])
-    )
-  })
-  observeEvent(input$graph2, {
-    output$graph=renderPlot(
+      
+    }else if(graphName()=="histo2"){
       hist(v$simSelected[v$indSubset,"M2"])
-    )
-  })
-  observeEvent(input$pieChart1, {
-    output$graph=renderPlot(
-      pie(as.numeric(c(GW_glob[v$idSim*5-2], 1.00 - GW_glob[v$idSim*5-2])), 
-          labels =c(paste("True Predictions for Neural Networks : ",round(GW_glob[v$idSim*5-2]*100,1),"%"),paste("Wrong Predictions for Neural Networks : ", round((1.00 - GW_glob[v$idSim*5-2])*100,1),"%")),
-          main = "Neural Network : True Predictions VS Wrong Predictions", 
-          col = c("#336699","#FFFFFF"))
-      )
-  })
-  observeEvent(input$pieChart2, {
-    output$graph=renderPlot(
-      pie(as.numeric(c(GW_glob[v$idSim*5-1], 1.00 - GW_glob[v$idSim*5-1])), 
-          labels =c(paste("True Predictions for Logistic Regression : ",round(GW_glob[v$idSim*5-1]*100,1),"%"),paste("Wrong Predictions for Logistic Regression : ", round((1.00 - GW_glob[v$idSim*5-1])*100,1),"%")),
-          main = "Logistic Regression : True Predictions VS Wrong Predictions", 
-          col = c("#336699","#FFFFFF"))
-    )
+      
+    }else if(graphName()=="Classification Pie Chart"){
+
+      pie(as.numeric(c(GW_glob[v$idSim*5-3],
+                       GW_glob[v$idSim*5-2], 
+                       GW_glob[v$idSim*5],
+                       GW_glob[v$idSim*5-1])), 
+          labels =c(paste("Classified correctly by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5-3]*100,0),"%"),
+                    paste("Classified correctly by \n Neural Networks ONLY : \n",round(GW_glob[v$idSim*5-2]*100,0),"%"),
+                    paste("Wrongly classified by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5]*100,0),"%"),
+                    paste("Classified correctly by \n Logistic Regression ONLY : \n", round(GW_glob[v$idSim*5-1]*100,0),"%")),
+          main = "Classification Pie Chart",
+          col = c("#A9EAFE","#CECECE","#FDF1B8","#CECECE"))
+      
+    }else if(graphName()=="ROC Curve"){
+      
+    }
   })
   
 }
