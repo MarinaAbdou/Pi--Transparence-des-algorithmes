@@ -3,6 +3,7 @@ library(BBmisc)
 library(fBasics)
 library(tidyverse)
 library(caret)
+library(ROCR)
 
 #
 randomSample <- function(x,perc){
@@ -49,6 +50,8 @@ GoodWrong <- function(Tar,P1,P2){
 }
 
 ui <- fluidPage(
+  
+  #includeCSS("styles.css"),
   
   # App title ----
   titlePanel("Title ?"),
@@ -273,7 +276,21 @@ server <- function(input, output){
           col = c("#A9EAFE","#CECECE","#FDF1B8","#CECECE"))
       
     }else if(graphName()=="ROC Curve"){
+          #Predictions 0/1
+      #predLR <- prediction(PREDICTION[nSim*v$idSim],TEST["TARGET"])
+      #predNN <- prediction(PREDICTION[nSim*v$idSim-1],TEST["TARGET"])
+          #Predictions in %
+      predLR <- prediction(RESULTS[nSim*v$idSim],TEST["TARGET"])
+      predNN <- prediction(RESULTS[nSim*v$idSim-1],TEST["TARGET"])
       
+      perfLR <- performance(predLR,'tpr','fpr')
+      perfNN <- performance(predNN,'tpr','fpr')
+      ROCgraph <- plot(perfNN,main="ROC curve",col="red")
+      par(new=TRUE)
+      plot(perfLR,col="blue")
+      abline(0,1)
+      legend("topleft", legend=c("Neural Networks", "Logistic Regression"),
+             col=c("red", "blue"), lty=1:1, cex=0.8)
     }
   })
   
