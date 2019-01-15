@@ -15,7 +15,15 @@ import seaborn as sns
 sns.set(style="white")
 sns.set(style="whitegrid", color_codes=True)
 
+simupath = "simulated.csv"
+simu = pd.read_csv(simupath, header=0)
+simu = simu.values
+x_simu=simu[:,:-1]
 
+nsimupath = "nsimulated.csv"
+nsimu = pd.read_csv(nsimupath, header=0)
+nsimu = nsimu.values
+x_nsimu=nsimu[:,:-1]
 # In[4]:
 
 
@@ -69,7 +77,8 @@ logreg.fit(x_train, y_train)
 #Predicting the test set results and calculating the accuracy
 y_pred = logreg.predict(x_test)
 print('Accuracy of logistic regression classifier on test set: {:.2f}'.format(logreg.score(x_test, y_test)))
-
+lrsimulation = logreg.predict_proba(x_simu)[:,1]
+nlrsimulation = logreg.predict_proba(x_nsimu)[:,1]
 
 # In[ ]:
 
