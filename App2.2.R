@@ -1,4 +1,4 @@
-path <- "/Users/alessandrobusato/Desktop/ESILV/Project/Pi2-Transparence-des-algorithmes-master"
+path <- "C:/Users/Marina/Documents/Semestre 9 (2018-2019)/Pi²/Pi2-Transparence-des-algorithmes-AlessandroBusato-patch-1"
 setwd(path)
 
 source("App2_Settings.R")
@@ -37,14 +37,29 @@ ui <- fluidPage(
   
   hr(),
   
+  fluidRow(
+    column(6,
+           plotOutput("ROCGlob")),
+    
+    column(6,
+           plotOutput("PieGlob"))
+  ),
+  
+  hr(),
+  
   h4("Select your subset :"),
   
   fluidRow(
+    #column(2,
+    #       numericInput("ind_var30", "ind_var30: select a value",0,min=0,max=1,step=1)),
     column(2,
-           numericInput("ind_var30", "ind_var30: select a value",0,min=0,max=1,step=1)),
+           selectInput("ind_var30", "ind_var30: select a value",c("No Filter","0","1"))),
+    
+    #column(2,
+    #       numericInput("num_meses_var5_ult3", "num_meses_var5_ult3: select a value",0,min=0,max=3,step=1)),
     
     column(2,
-           numericInput("num_meses_var5_ult3", "num_meses_var5_ult3: select a value",0,min=0,max=3,step=1)),
+           selectInput("num_meses_var5_ult3", "num_meses_var5_ult3: select a value",c("No Filter","0","1","2","3"))),
     
     column(2,
            sliderInput("num_var30", "num_var30: select a range", min = 0, 
@@ -54,8 +69,11 @@ ui <- fluidPage(
            sliderInput("num_var42", "num_var42: select a range", min = 0, 
                        max = 18, value = c(0, 18))),
     
+    #↨column(2,
+    #       numericInput("ind_var5", "ind_var5: select a value",0,min=0,max=1,step=1)),
+    
     column(2,
-           numericInput("ind_var5", "ind_var5: select a value",0,min=0,max=1,step=1)),
+           selectInput("ind_var5", "ind_var5: select a value",c("No Filter","0","1"))),
     
     # button to apply or not to apply the filter
     column(1,
@@ -169,20 +187,118 @@ server <- function(input, output){
     v$indSubset=c(1:length(TEST[,1]))
   })
   observeEvent(input$af, {
-    v$var1=input$ind_var30
-    v$var2=input$num_meses_var5_ult3
-    v$var3=input$num_var30
-    v$var4=input$num_var42
-    v$var5=input$ind_var5
+    if(input$ind_var30 == "No Filter" && input$num_meses_var5_ult3 == "No Filter" && input$ind_var5 == "No Filter"){
+      v$var3=input$num_var30
+      v$var4=input$num_var42
+      
+      #filter variable
+      v$indSubset=which(TEST["num_var30"]>v$var3[1]
+                        & TEST["num_var30"]<v$var3[2]
+                        & TEST["num_var42"]>v$var4[1]
+                        & TEST["num_var42"]<v$var4[2])
+    }else if(input$ind_var30 == "No Filter" && input$num_meses_var5_ult3 == "No Filter" && input$ind_var5 != "No Filter"){
+      v$var3=input$num_var30
+      v$var4=input$num_var42
+      v$var5=as.numeric(input$ind_var5)
+      
+      #filter variable
+      v$indSubset=which(TEST["num_var30"]>v$var3[1]
+                        & TEST["num_var30"]<v$var3[2]
+                        & TEST["num_var42"]>v$var4[1]
+                        & TEST["num_var42"]<v$var4[2]
+                        & TEST["ind_var5"]==v$var5)
+    }else if(input$ind_var30 == "No Filter" && input$num_meses_var5_ult3 != "No Filter" && input$ind_var5 == "No Filter"){
+      v$var2=as.numeric(input$num_meses_var5_ult3)
+      v$var3=input$num_var30
+      v$var4=input$num_var42
+      
+      #filter variable
+      v$indSubset=which(TEST["num_meses_var5_ult3"]==v$var2
+                        & TEST["num_var30"]>v$var3[1]
+                        & TEST["num_var30"]<v$var3[2]
+                        & TEST["num_var42"]>v$var4[1]
+                        & TEST["num_var42"]<v$var4[2])
+    }else if(input$ind_var30 != "No Filter" && input$num_meses_var5_ult3 == "No Filter" && input$ind_var5 == "No Filter"){
+      v$var1=as.numeric(input$ind_var30)
+      v$var3=input$num_var30
+      v$var4=input$num_var42
+      
+      #filter variable
+      v$indSubset=which(TEST["ind_var30"]==v$var1 
+                        & TEST["num_var30"]>v$var3[1]
+                        & TEST["num_var30"]<v$var3[2]
+                        & TEST["num_var42"]>v$var4[1]
+                        & TEST["num_var42"]<v$var4[2])
+    }else if(input$ind_var30 != "No Filter" && input$num_meses_var5_ult3 != "No Filter" && input$ind_var5 == "No Filter"){
+      v$var1=as.numeric(input$ind_var30)
+      v$var2=as.numeric(input$num_meses_var5_ult3)
+      v$var3=input$num_var30
+      v$var4=input$num_var42
+      
+      #filter variable
+      v$indSubset=which(TEST["ind_var30"]==v$var1 
+                        & TEST["num_meses_var5_ult3"]==v$var2
+                        & TEST["num_var30"]>v$var3[1]
+                        & TEST["num_var30"]<v$var3[2]
+                        & TEST["num_var42"]>v$var4[1]
+                        & TEST["num_var42"]<v$var4[2])
+    }else if(input$ind_var30 == "No Filter" && input$num_meses_var5_ult3 != "No Filter" && input$ind_var5 != "No Filter"){
+      v$var2=as.numeric(input$num_meses_var5_ult3)
+      v$var3=input$num_var30
+      v$var4=input$num_var42
+      v$var5=as.numeric(input$ind_var5)
+      
+      #filter variable
+      v$indSubset=which(TEST["num_meses_var5_ult3"]==v$var2
+                        & TEST["num_var30"]>v$var3[1]
+                        & TEST["num_var30"]<v$var3[2]
+                        & TEST["num_var42"]>v$var4[1]
+                        & TEST["num_var42"]<v$var4[2]
+                        & TEST["ind_var5"]==v$var5)
+    }else if(input$ind_var30 != "No Filter" && input$num_meses_var5_ult3 == "No Filter" && input$ind_var5 != "No Filter"){
+      v$var1=as.numeric(input$ind_var30)
+      v$var3=input$num_var30
+      v$var4=input$num_var42
+      v$var5=as.numeric(input$ind_var5)
+      
+      #filter variable
+      v$indSubset=which(TEST["ind_var30"]==v$var1 
+                        & TEST["num_var30"]>v$var3[1]
+                        & TEST["num_var30"]<v$var3[2]
+                        & TEST["num_var42"]>v$var4[1]
+                        & TEST["num_var42"]<v$var4[2]
+                        & TEST["ind_var5"]==v$var5)
+    }else if(input$ind_var30 != "No Filter" && input$num_meses_var5_ult3 != "No Filter" && input$ind_var5 != "No Filter"){
+      v$var1=as.numeric(input$ind_var30)
+      v$var2=as.numeric(input$num_meses_var5_ult3)
+      v$var3=input$num_var30
+      v$var4=input$num_var42
+      v$var5=as.numeric(input$ind_var5)
+      
+      #filter variable
+      v$indSubset=which(TEST["ind_var30"]==v$var1 
+                        & TEST["num_meses_var5_ult3"]==v$var2
+                        & TEST["num_var30"]>v$var3[1]
+                        & TEST["num_var30"]<v$var3[2]
+                        & TEST["num_var42"]>v$var4[1]
+                        & TEST["num_var42"]<v$var4[2]
+                        & TEST["ind_var5"]==v$var5)
+    }
     
-    #filter variable
-    v$indSubset=which(TEST["ind_var30"]==v$var1 
-                      & TEST["num_meses_var5_ult3"]==v$var2
-                      & TEST["num_var30"]>v$var3[1]
-                      & TEST["num_var30"]<v$var3[2]
-                      & TEST["num_var42"]>v$var4[1]
-                      & TEST["num_var42"]<v$var4[2]
-                      & TEST["ind_var5"]==v$var5)
+    #v$var1=input$ind_var30
+    #v$var2=input$num_meses_var5_ult3
+    #v$var3=input$num_var30
+    #v$var4=input$num_var42
+    #v$var5=input$ind_var5
+    
+    ##filter variable
+    #v$indSubset=which(TEST["ind_var30"]==v$var1 
+    #                  & TEST["num_meses_var5_ult3"]==v$var2
+    #                  & TEST["num_var30"]>v$var3[1]
+    #                  & TEST["num_var30"]<v$var3[2]
+    #                  & TEST["num_var42"]>v$var4[1]
+    #                  & TEST["num_var42"]<v$var4[2]
+    #                  & TEST["ind_var5"]==v$var5)
     
   })
   
@@ -191,6 +307,34 @@ server <- function(input, output){
     print(paste("Subset Info : Number of observations = ",length(v$indSubset)))
   )
   
+  
+  output$ROCGlob <- renderPlot({
+    predLR <- prediction(RESULTS[nSim*v$idSim],TEST["TARGET"])
+    predNN <- prediction(RESULTS[nSim*v$idSim-1],TEST["TARGET"])
+    perfLR <- performance(predLR,'tpr','fpr')
+    perfNN <- performance(predNN,'tpr','fpr')
+    ROCgraph <- plot(perfNN,main="ROC curve",col="red")
+    par(new=TRUE)
+    plot(perfLR,col="blue")
+    abline(0,1)
+    legend("topleft", legend=c("Neural Networks", "Logistic Regression"),
+           col=c("red", "blue"), lty=1:1, cex=0.8)
+  })
+  
+  output$PieGlob <- renderPlot({
+    pie(as.numeric(c(GW_glob[v$idSim*5-3],
+                     GW_glob[v$idSim*5-2], 
+                     GW_glob[v$idSim*5],
+                     GW_glob[v$idSim*5-1])), 
+      
+      labels =c(paste("Classified correctly by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5-3]*100,0),"%"),
+                paste("Classified correctly by \n Neural Networks ONLY : \n",round(GW_glob[v$idSim*5-2]*100,0),"%"),
+                paste("Wrongly classified by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5]*100,0),"%"),
+                paste("Classified correctly by \n Logistic Regression ONLY : \n", round(GW_glob[v$idSim*5-1]*100,0),"%")),
+      
+      main = "Classification Pie Chart",
+      col = c("#A9EAFE","#CECECE","#FDF1B8","#CECECE"))
+  })
   
   output$graph <- renderPlot({
     
@@ -202,20 +346,27 @@ server <- function(input, output){
       
     }else if(graphName()=="Classification Pie Chart"){
       
-      pie(as.numeric(c(GW_glob[v$idSim*5-3],
-                       GW_glob[v$idSim*5-2], 
-                       GW_glob[v$idSim*5],
-                       GW_glob[v$idSim*5-1])), 
-          labels =c(paste("Classified correctly by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5-3]*100,0),"%"),
-                    paste("Classified correctly by \n Neural Networks ONLY : \n",round(GW_glob[v$idSim*5-2]*100,0),"%"),
-                    paste("Wrongly classified by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5]*100,0),"%"),
-                    paste("Classified correctly by \n Logistic Regression ONLY : \n", round(GW_glob[v$idSim*5-1]*100,0),"%")),
+      GWSub <-  GoodWrong(data.frame(TEST[v$indSubset,"TARGET"]),
+                          data.frame(PREDICTION[v$indSubset,v$idSim*2-1]),
+                          data.frame(PREDICTION[v$indSubset,v$idSim*2]))
+      
+      pie(
+        as.numeric(c(GWSub[v$idSim*5-3],
+                     GWSub[v$idSim*5-2], 
+                     GWSub[v$idSim*5],
+                     GWSub[v$idSim*5-1])), 
+        
+        labels =c(paste("Classified correctly by BOTH \n Neural Networks AND Logistic Regression : \n",round(GWSub[v$idSim*5-3]*100,0),"%"),
+                  paste("Classified correctly by \n Neural Networks ONLY : \n",round(GWSub[v$idSim*5-2]*100,0),"%"),
+                  paste("Wrongly classified by BOTH \n Neural Networks AND Logistic Regression : \n",round(GWSub[v$idSim*5]*100,0),"%"),
+                  paste("Classified correctly by \n Logistic Regression ONLY : \n", round(GWSub[v$idSim*5-1]*100,0),"%")),
+        
           main = "Classification Pie Chart",
           col = c("#A9EAFE","#CECECE","#FDF1B8","#CECECE"))
       
     }else if(graphName()=="ROC Curve"){
-      predLR <- prediction(RESULTS[nSim*v$idSim],TEST["TARGET"])
-      predNN <- prediction(RESULTS[nSim*v$idSim-1],TEST["TARGET"])
+      predLR <- prediction(RESULTS[v$indSubset,nSim*v$idSim],TEST[v$indSubset,"TARGET"])
+      predNN <- prediction(RESULTS[v$indSubset,nSim*v$idSim-1],TEST[v$indSubset,"TARGET"])
       perfLR <- performance(predLR,'tpr','fpr')
       perfNN <- performance(predNN,'tpr','fpr')
       ROCgraph <- plot(perfNN,main="ROC curve",col="red")
