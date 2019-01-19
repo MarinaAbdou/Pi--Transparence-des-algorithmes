@@ -251,7 +251,11 @@ server <- function(input, output){
     clusterResults(varForDisTab(),TEST,PREDICTION[,v$idSim*2-1],PREDICTION[,v$idSim*2]),rownames = TRUE
   )
   output$Misobs=renderTable(
-    DistVarPred(varForDisTab(),Test[Misclassified(TEST[,length(TEST[1,])],PREDICTION[,v$idSim*2-1])])
+    table1<-cbind.fill(Misclassified_NN=DistVarPred(varForDisTab(),(TEST[Misclassified(c(TEST[,length(TEST[1,])]),PREDICTION[,v$idSim*2-1]),])),
+                       Misclassified_LR=DistVarPred(varForDisTab(),(TEST[Misclassified(c(TEST[,length(TEST[1,])]),PREDICTION[,v$idSim*2]),])),
+                       Test_Dist=DistVarPred(varForDisTab(),TEST),fill=0),
+    rownames = TRUE,
+    colnames = TRUE
   )
   output$heatmap <- renderPlotly({
     simicmat <- cmat[((v$idSim-1)*(grid+1)+1):((v$idSim)*(grid+1)),]
