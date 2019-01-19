@@ -6,6 +6,7 @@ library(tidyverse)
 library(caret)
 library(data.table)
 library(plotly)
+library(rowr)
 
 randomSample <- function(x,perc){
   nobs=nrow(x)
@@ -158,46 +159,46 @@ clusterResults=function(var,TEST,pred1,pred2){
   return(dt)
 }
 Misclassified <- function(Tar,P){
-  l<-length(Tar[,1])
+  l<-length(Tar)
   col<-c()
   for (i in 1:l){
-    if(Tar[i,1]!=P[i,1]){
+    if(Tar[i]!=P[i]){
       col<-c(col,i)
     }
   }
   return(col)
 }
-DistVarNum=function(var,TEST){
-  vector=TEST[,var]
+DistVarNum=function(var,tes){
+  vector=tes[,var]
   testmean <- mean(vector)
   testmedian <- median(vector)
-  testmode <- mode(vector)
-  testvariance <- variance(vector)
+  testvariance <- var(vector)
   clData=data.frame()
-  clData=rbind(clData,testmean,testmedian,testmode,testvariance)
-  row.names(clData)=c("Mean","Median","Mode","Variance")
+  clData=rbind(clData,testmean,testmedian,testvariance)
+  row.names(clData)=c("Mean","Median","Variance")
   return(clData)
 }
-DistVarCat=function(var,TEST){
-  vector=TEST[,var]
+DistVarCat=function(var,tes){
+  vector=tes[,var]
   clData=data.frame()
+  names=c()
   for(i in 1:length(unique(vector))){
-    clData=rbind(clData, sum(vector == unique(vector)[i])/length(vector))
+    clData=rbind(clData, sum(vector == unique(vector)[i])/length(vector)*100)
+    names=c(names,toString(unique(vector)[i]))
   }
-  row.names(clData)=c(unique(vector))
+  row.names(clData)=names
   return(clData)
 }
-DistVarPred <- function(var,TEST){
-  l=length(unique(TEST[,var]))
+DistVarPred <- function(var,tes){
+  l=length(unique(tes[,var]))
   if (l>8){
-    dt=DistVarNum(var,TEST)
+    dt=DistVarNum(var,tes)
   }
   else{
-    dt=DistVarCat(var,TEST)
+    dt=DistVarCat(var,tes)
   }
   return(dt)
 }
-
 
 indexSubset=function(TEST,v1,v2,v3,v4,v5){
   ind=which(if(v1!="No Filter"){TEST["ind_var30"]==as.integer(v1)}
