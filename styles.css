@@ -2,18 +2,19 @@
 
 h1{
   font-family: 'Lobster', cursive;
-  font-weight: 500;
+  font-weight: bold;
   line-height: 1.1;
-  color: #ad1d28;
+  color:  #1C86EE;
+  text-align: center;
 }
 
-h4 {
-  font-family: 'Georgia', serif;
-  font-weight: 500;
-  line-height: 1.1;
-  color: #ad1d28;
+h3 {
+  color: grey;
+  text-transform: uppercase;
 }
 
-body {
-  background-color: #F0FFFF;
+h5 {	
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
 }
