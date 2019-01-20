@@ -1,9 +1,17 @@
 path <- "C:/Users/Marina/Documents/Semestre 9 (2018-2019)/Pi²/Pi2-Transparence-des-algorithmes-AlessandroBusato-patch-1"
 setwd(path)
 
+#install.packages("shinythemes")
+library(shinythemes)
+
 source("App2_Settings.R")
 
 ui <- fluidPage(
+  
+  includeCSS("styles.css"),
+  
+  theme = shinytheme("spacelab"),
+  
   fluidRow(
     column(6, align = "left",
            actionButton("Prev","Previous")),
@@ -13,26 +21,24 @@ ui <- fluidPage(
   ),
   
   # App title ----
-  fluidRow(column(7,offset = 2, titlePanel(textOutput("Title")))), 
+  fluidRow(headerPanel(textOutput("Title"))), 
   hr(),
   
   # output varariables that represent generic info: train features, time/prec 
-  h4("Generic Informations :"),
+  h3("Generic Informations :"),
   
-  fluidRow(
+  fluidRow(align = "center",
     column(3, align = "center",
-           tableOutput("InfoSim")),
-    
-    column(2, align = "center",
+           tableOutput("InfoSim"),
            tableOutput("PrecTime")),
-    
+  
     column(6, align = "center",
            tableOutput("GW"))
   ),
   
   hr(),
   
-  fluidRow(
+  fluidRow(align = "center",
     column(6, align = "center",
            plotOutput("ROCGlob")),
     
@@ -42,59 +48,66 @@ ui <- fluidPage(
   
   hr(),
   
+  h3("Subset Informations : "),
+  
   fluidRow(
-
-    column(4,
-           h4("Select your subset :"),
-           selectInput("ind_var30", "Select a value for ind_var30 : ",c("No Filter","0","1")),
-           selectInput("num_meses_var5_ult3", "Select a value for num_meses_var5_ult3 : ",c("No Filter","0","1","2","3")),
-           sliderInput("num_var30", "Select a range for num_var30 : ", min = 0, max = 33, value = c(0, 33)),
-           sliderInput("num_var42", "Select a range for num_var42 : ", min = 0, max = 18, value = c(0, 18)),
-           selectInput("ind_var5", "Select a value ind_var5 : ",c("No Filter","0","1")),
-           hr(),
-           fluidRow(
-             column(2,
-                    actionButton("nf","No filter")),
-             column(2,
-                    actionButton("af","Apply filter")))),
     
-    column(7,
-           #text in wich we represent nof obs, n of good prediction for both models, only one of them, no one
-           h4(textOutput("SubsetInfo")),
-           tableOutput("GWsubset"),
-           hr(),
-           h4("Select a graph :"),
-           selectInput("N", "", c("Default","histo1", "histo2", "Classification Pie Chart", "ROC Curve")),
-           plotOutput("graph"))
+    sidebarLayout(
+      sidebarPanel(h5("Select your subset :"),
+                   selectInput("ind_var30", "Select a value for ind_var30 : ",c("No Filter","0","1")),
+                   selectInput("num_meses_var5_ult3", "Select a value for num_meses_var5_ult3 : ",c("No Filter","0","1","2","3")),
+                   sliderInput("num_var30", "Select a range for num_var30 : ", min = 0, max = 33, value = c(0, 33)),
+                   sliderInput("num_var42", "Select a range for num_var42 : ", min = 0, max = 18, value = c(0, 18)),
+                   selectInput("ind_var5", "Select a value ind_var5 : ",c("No Filter","0","1")),
+                   hr(),
+                   fluidRow(align = "center",
+                     column(6, align = "center",
+                            actionButton("nf","No filter")),
+                     column(6, align = "center",
+                            actionButton("af","Apply filter")))),
+      mainPanel(#text in wich we represent nof obs, n of good prediction for both models, only one of them, no one
+        h5(textOutput("SubsetInfo")),
+        tableOutput("GWsubset"),
+        hr(),
+        h5("Select a graph :"),
+        selectInput("N", "", c("Default","histo1", "histo2", "Classification Pie Chart", "ROC Curve")),
+        plotOutput("graph"))
+    )
   ),
   
+  hr(),
+  
+  h3("Distribution of the results for a variable :"),
+  
   fluidRow(
-    h4("Distribution of the results for a variable :"),
-    column(4, align = "center",
-           selectInput("VarForResultsDistr","Select a variable to visualize the distribution of the results",c(colnames(TEST[morCorrIndex])))),
-    column(7, align = "center",
-           tableOutput("ResDisTab"))),
+    sidebarLayout(
+      sidebarPanel(
+        selectInput("VarForResultsDistr","Select a variable to visualize the distribution of the results",c(colnames(TEST[morCorrIndex])))
+      ),
+      mainPanel(align = "center",
+        tableOutput("ResDisTab")
+      )
+    )),
   
   hr(),
-  fluidRow(
-    column(11,
-           h4(" Distribution of misclassified samples compared to test distribution"),
-           tableOutput("Misobs"))
-  ),
- 
+  
+  h3(" Distribution of misclassified samples compared to test distribution"),
+  
+  fluidRow(tableOutput("Misobs")),
+  
   hr(),
-  fluidRow(
+  fluidRow(align = "center",
     column(5,
-           h4(""),
+           h5(""),
            plotlyOutput("heatmap", width = "100%", height="500px")),
     column(5,
-           h4(" "),
+           h5(" "),
            plotlyOutput("heatmaplr", width = "100%", height="500px")),
     column(5,
-           h4(""),
+           h5(""),
            plotlyOutput("cheatmap", width = "100%", height="500px")),
     column(5,
-           h4(""),
+           h5(""),
            plotlyOutput("cheatmaplr", width = "100%", height="500px")
     )
   )
@@ -110,10 +123,6 @@ server <- function(input, output){
                      indSubset=c(1:length(TEST[,1])),  
                      v1 = 0,v2=0, v3=c(0,33),v4=c(0,18),v5=0
   )
-  
-  #output$N_Sim = renderText(
-  #  print(paste("Simulation ",v$idSim))
-  #)
   
   output$Title = renderText(
     print(paste("Comparison between the results for simulation ",v$idSim))
@@ -174,7 +183,7 @@ server <- function(input, output){
   
   
   output$SubsetInfo=renderText(
-    print(paste("Subset Informations : Number of observations = ",length(v$indSubset)))
+    print(paste("Number of observations = ",length(v$indSubset)))
   )
   
   
@@ -196,14 +205,14 @@ server <- function(input, output){
                      GW_glob[v$idSim*5-2], 
                      GW_glob[v$idSim*5],
                      GW_glob[v$idSim*5-1])), 
-      
-      labels =c(paste("Classified correctly by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5-3]*100,0),"%"),
-                paste("Classified correctly by \n Neural Networks ONLY : \n",round(GW_glob[v$idSim*5-2]*100,0),"%"),
-                paste("Wrongly classified by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5]*100,0),"%"),
-                paste("Classified correctly by \n Logistic Regression ONLY : \n", round(GW_glob[v$idSim*5-1]*100,0),"%")),
-      
-      main = "Generic Classification Pie Chart",
-      col = c("#A9EAFE","#CECECE","#FDF1B8","#CECECE"))
+        
+        labels =c(paste("Classified correctly by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5-3]*100,0),"%"),
+                  paste("Classified correctly by \n Neural Networks ONLY : \n",round(GW_glob[v$idSim*5-2]*100,0),"%"),
+                  paste("Wrongly classified by BOTH \n Neural Networks AND Logistic Regression : \n",round(GW_glob[v$idSim*5]*100,0),"%"),
+                  paste("Classified correctly by \n Logistic Regression ONLY : \n", round(GW_glob[v$idSim*5-1]*100,0),"%")),
+        
+        main = "Generic Classification Pie Chart",
+        col = c("#87CEFA","#BAB1B1","#AD1D28","#BAB1B1"))
   })
   
   output$graph <- renderPlot({
@@ -231,8 +240,8 @@ server <- function(input, output){
                   paste("Wrongly classified by BOTH \n Neural Networks AND Logistic Regression : \n",round(GWSub[5]*100,0),"%"),
                   paste("Classified correctly by \n Logistic Regression ONLY : \n", round(GWSub[4]*100,0),"%")),
         
-          main = "Subset Classification Pie Chart",
-          col = c("#A9EAFE","#CECECE","#FDF1B8","#CECECE"))
+        main = "Subset Classification Pie Chart",
+        col = c("#87CEFA","#BAB1B1","#AD1D28","#BAB1B1"))
       
     }else if(graphName()=="ROC Curve"){
       predLR <- prediction(RESULTS[v$indSubset,2*v$idSim],TEST[v$indSubset,"TARGET"])
