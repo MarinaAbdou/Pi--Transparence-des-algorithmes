@@ -91,7 +91,7 @@ ui <- fluidPage(
   
   hr(),
   
-  h3(" Distribution of misclassified samples compared to test distribution"),
+  h3(" Distribution of misclassified samples compared to test distribution :"),
   
   fluidRow(tableOutput("Misobs")),
   
