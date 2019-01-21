@@ -5,6 +5,9 @@ library(tidyverse)
 library(caret)
 library(reticulate)
 
+#install.packages("shinythemes")
+library(shinythemes)
+
 randomSample <- function(x,perc){
   nobs=nrow(x)
   n=as.integer(perc*nobs)
@@ -17,13 +20,25 @@ normalize <- function(x) {
 
 
 ui <- fluidPage(
-  titlePanel("App1: Choice of 'a priori' features and running of the algorithms"),
-  numericInput("noise", "Select a level of noise",0,min=0,max=4,step=1),
-  numericInput("dataPerc","Select the percentage of observations to be used", 100,min=20,max=100,step=20),
-  numericInput("varPerc","Select the percentage of variables to be used",  100, min=20, max=100,step=20),
-  actionButton("go","Run algorithms"),
+  includeCSS("styles.css"),
   
-  textOutput("t")
+  theme = shinytheme("spacelab"),
+  
+  fluidRow(headerPanel("Choice of 'a priori' features and running of the algorithms")),
+  
+  hr(),
+  
+  h3("Choose your features :"),
+  
+  fluidRow(
+    sidebarLayout(
+      sidebarPanel(align = "center",
+                   numericInput("noise", "Select a level of noise",0,min=0,max=4,step=1),
+                   numericInput("dataPerc","Select the percentage of observations to be used", 100,min=20,max=100,step=20),
+                   numericInput("varPerc","Select the percentage of variables to be used",  100, min=20, max=100,step=20),
+                   actionButton("go","Run algorithms")),
+      mainPanel(align = "center",
+                h5(textOutput("t")))))
 )
 
 server <- function(input, output){
@@ -80,7 +95,7 @@ server <- function(input, output){
   file.create("csimlr.csv")
   a<-data.frame(t(c("Noise","% of Obs","% of Var","X4","X5")))
   write.table(a, file = "simdata.csv", sep = ",", append = TRUE, quote = TRUE, col.names = FALSE, row.names = FALSE)
-  v<- reactiveValues(noise = NULL,dataPerc=NULL,varPerc=NULL, NTrain=NULL, NTest=NULL)
+  v<- reactiveValues(noise = NULL,dataPerc=NULL,varPerc=NULL, NTrain=NULL, NTest=NULL, OutputText = NULL)
   
 
   observeEvent(input$go, {
@@ -89,6 +104,7 @@ server <- function(input, output){
     v$varPerc<- input$varPerc/100
     v$NTrain<-  NTrain
     v$NTest<-  NTest
+    v$OutputText <- paste("Your simulation with parameters : \n Level",v$noise," of noise,  ",v$dataPerc*100,"% of observations to be used and ",v$varPerc*100,"% of variables to be used was saved.")
     
     if (v$noise==0) {
       v$NTrain <- NTrain
@@ -231,7 +247,7 @@ server <- function(input, output){
   
   
   output$t <- renderText({
-    print(paste(v$noise,v$dataPerc,v$varPerc))
+    print(v$OutputText)
   })
 }
 
