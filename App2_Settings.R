@@ -199,19 +199,27 @@ DistVarPred <- function(var,tes){
   }
   return(dt)
 }
-
 indexSubset=function(TEST,v1,v2,v3,v4,v5){
-  ind=which(if(v1!="No Filter"){TEST["ind_var30"]==as.integer(v1)}
-            else{TEST["ind_var30"]!="Nothing"}&
-              if(v2!="No Filter"){TEST["num_meses_var5_ult3"]==as.integer(v2 )}
-            else{TEST["num_meses_var5_ult3"]!="Nothing"}&
-              TEST["num_var30"]>=v3[1]&TEST["num_var30"]<=v3[2]&
-              TEST["num_var42"]>=v4[1]&TEST["num_var42"]<=v4[2]&
-              if(v5!="No Filter"){TEST["ind_var5"]==as.integer(v5)}
-            else{TEST["ind_var5"]!="Nothing"}
-  )
-  
-  return(ind)
+  if(v1!="No Filter"){ind<-which(TEST["ind_var30"]!=as.integer(v1))}
+  else{ind<-c()}
+  if(v2!="No Filter"){tmp<-which(TEST["num_meses_var5_ult3"]!=as.integer(v2))}
+  else{tmp<-c()}
+  ind<-c(ind,tmp)
+  if(v5!="No Filter"){tmp<-which(TEST["ind_var5"]!=as.integer(v5))}
+  else{tmp<-c()}
+  ind<-c(ind,tmp)
+  tmp<-which(TEST["num_var30"]<v3[1])
+  ind<-c(ind,tmp)
+  tmp<-which(TEST["num_var30"]>v3[2])
+  ind<-c(ind,tmp)
+  tmp<-which(TEST["num_var42"]<v4[1])
+  ind<-c(ind,tmp)
+  tmp<-which(TEST["num_var42"]>v4[2])
+  ind<-c(ind,tmp)
+  ind<-unique(ind)
+  tmp<-1:length(TEST[,1])
+  res<-tmp[-ind]
+  return(res)
 }
 
 # setting of directory
