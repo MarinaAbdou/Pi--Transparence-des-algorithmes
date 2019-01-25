@@ -18,3 +18,26 @@ h5 {
   font-weight: bold;
   text-transform: uppercase;
 }
+
+/*h6 {	
+  text-align: center;
+  font-weight: bold;
+  /*-webkit-transform: rotate(-90.0deg);
+ /*text-transform: uppercase;
+}
+
+#vertical {
+  /*text-align: right;
+  font-weight: bold;
+  -webkit-transform: rotate(-90.0deg); /*for chrome
+  vertical-align: bottom;
+}
+
+#horizontal {
+  text-align: center;
+  font-weight: bold;
+}
+
+/*.rotation90{
+	-webkit-transform: rotate(-90.0deg); /*for chrome
+}*/
