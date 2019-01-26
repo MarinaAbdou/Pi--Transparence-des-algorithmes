@@ -184,19 +184,19 @@ server <- function(input, output){
     write.csv(y[1:length(y[,1]),],file="nsimulated.csv", row.names = FALSE)
     write.csv(v$NTrain[1:length(v$NTrain[,1]),],file="train_features.csv", row.names = FALSE)
     write.csv(v$NTest[1:length(v$NTest[,1]),],file="test_features.csv", row.names = FALSE)
-    timenn <- proc.time()
+    timennst <- Sys.time()
     py_run_file("NN.py")
     #end measure time
-    proc.time() - timenn
+    timennen <- Sys.time()
+    timenn <- as.numeric(timennen-timennst)
     nn_simu <- py$simulation
     nn_csimu <- py$nsimulation
-    timenn<-as.numeric(timenn[3])
     nn_pred <- py$y_pred_keras
-    timelr <- proc.time()
+    timelrst <- Sys.time()
     py_run_file("LR-code.py")
     #end measure time
-    proc.time() - timelr
-    timelr<-as.numeric(timelr[3])
+    timelren <- Sys.time()
+    timelr<-as.numeric(timelren-timelrst)
     lr_simu <- py$lrsimulation
     lr_csimu <- py$nlrsimulation
     res_sim_nn <- data.frame(nn_simu[1:(grid+1)])
