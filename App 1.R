@@ -70,6 +70,7 @@ server <- function(input, output){
   rangetrain<-1:nrow(Train)
   NTrain <- NData[rangetrain,]
   NTest <- NData[-rangetrain,]
+  x_per<-NTest[41,]
   if (file.exists("simnn.csv")){
     file.remove("simnn.csv")
   }
@@ -143,11 +144,11 @@ server <- function(input, output){
     
     v$NTrain <- v$NTrain[tar]
     v$NTest <- v$NTest[tar]
+    x<- data.frame(t(x_per[tar]))
     var1 <- nvar1
     var2 <- nvar2
     cvar1 <- cnvar1
     cvar2 <- cnvar2
-    x<-data.frame(colMeans(v$NTest))
     y<-data.frame(t(data.frame(rep(x,each=(grid*(grid+1))))))
     ny<-data.frame(t(data.frame(rep(x,each=(xgrid*(ygrid))))))
     s1mi <- min(v$NTest[var1])
