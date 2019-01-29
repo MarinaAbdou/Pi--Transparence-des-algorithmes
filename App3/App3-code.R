@@ -9,7 +9,7 @@ library(caret)
 library(pROC)
 
 results <- read.csv("results.csv", header=TRUE)
-simdata <- read.csv("simdata.csv", header=TRUE)
+simdata <- read.csv("simdata.csv", header=FALSE)
 sample_test <- read.csv("sample_test.csv")
 
 results=data.frame(t(results))
