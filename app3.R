@@ -34,7 +34,7 @@ ui <- fluidPage(
  
  sidebarLayout(
    sidebarPanel(
-     selectInput("noise","Noise level",c("No noise"=1,"lOW"=2,"medium"=3,"high"=4,"NoiseG"=5),selected = 1),
+     selectInput("noise","Noise level",c("No noise"=1,"Low"=2,"Medium"=3,"High"=4,"NoiseG"=5),selected = 1),
      selectInput("ni", "Feature to visualize",
                  c("% good predictions"=1,
                    "AUC"=2,
@@ -147,7 +147,7 @@ ui <- fluidPage(
  
  sidebarLayout(
    sidebarPanel(
-     selectInput("dn","Noise level",c("No noise"=1,"0"=2,"2"=3,"3"=4,"NoiseG"=5),selected = 1),
+     selectInput("dn","Noise level",c("No noise"=1,"Low"=2,"Medium"=3,"High"=4,"NoiseG"=5),selected = 1),
      selectInput("dv","Variables percentage",c("20%"=1,"40%"=2,"60%"=3,"80%"=4,"100%"=5),selected=5),
      selectInput("di2", "Feature to visualize",
                  c("% good predictions"=1,
@@ -169,7 +169,7 @@ ui <- fluidPage(
  
  sidebarLayout(
    sidebarPanel(
-     selectInput("vn","Noise level",c("No noise"=1,"0"=2,"2"=3,"3"=4,"NoiseG"=5),selected = 1),
+     selectInput("vn","Noise level",c("No noise"=1,"Low"=2,"Medium"=3,"High"=4,"NoiseG"=5),selected = 1),
      selectInput("vd","Observations percentage",c("20%"=1,"40%"=2,"60%"=3,"80%"=4,"100%"=5),selected=5),
      selectInput("vi2", "Feature to visualize",
                  c("% good predictions"=1,
