@@ -43,10 +43,10 @@ GoodWrong <- function(Tar,P1,P2){
   ng=ng/l
   
   dt=data.frame("Observations"=c(l),
-                "Correct predictions for both"=c(g),
-                "Correct for NN, wrong for LR"=c(g1),
-                "Correct for LR, wrong for NN"=c(g2),
-                "Wrong predictions for both"=c(ng)
+                "Correct"=c(g),
+                "Correct only for DTree"=c(g1),
+                "Correct only for LReg"=c(g2),
+                "Wrong"=c(ng)
   )
   return(dt)
 }
@@ -102,10 +102,10 @@ PercGoodWrong2<- function(Tar,P1,P2){
     }
   }
   dt=data.frame("Observations"=c(l),
-                "Correct predictions"=c(100*g/l),
-                "Correct for NN, wrong for LR"=c(100*g1/l),
-                "Correct for LR, wrong for NN"=c(100*g2/l),
-                "Wrong predictions"=c(100*ng/l)
+                "Correct"=c(100*g/l),
+                "Correct only for DTree"=c(100*g1/l),
+                "Correct only for LReg"=c(100*g2/l),
+                "Wrong"=c(100*ng/l)
   )
   return(dt)
 }
@@ -158,47 +158,6 @@ clusterResults=function(var,TEST,pred1,pred2){
   }
   return(dt)
 }
-Misclassified <- function(Tar,P){
-  l<-length(Tar)
-  col<-c()
-  for (i in 1:l){
-    if(Tar[i]!=P[i]){
-      col<-c(col,i)
-    }
-  }
-  return(col)
-}
-DistVarNum=function(var,tes){
-  vector=tes[,var]
-  testmean <- mean(vector)
-  testmedian <- median(vector)
-  testvariance <- var(vector)
-  clData=data.frame()
-  clData=rbind(clData,testmean,testmedian,testvariance)
-  row.names(clData)=c("Mean","Median","Variance")
-  return(clData)
-}
-DistVarCat=function(var,tes){
-  vector=tes[,var]
-  clData=data.frame()
-  names=c()
-  for(i in 1:length(unique(vector))){
-    clData=rbind(clData, sum(vector == unique(vector)[i])/length(vector)*100)
-    names=c(names,toString(unique(vector)[i]))
-  }
-  row.names(clData)=names
-  return(clData)
-}
-DistVarPred <- function(var,tes){
-  l=length(unique(tes[,var]))
-  if (l>8){
-    dt=DistVarNum(var,tes)
-  }
-  else{
-    dt=DistVarCat(var,tes)
-  }
-  return(dt)
-}
 indexSubset=function(TEST,v1,v2,v3,v4,v5){
   if(v1!="No Filter"){ind<-which(TEST["ind_var30"]!=as.integer(v1))}
   else{ind<-c()}
@@ -222,9 +181,59 @@ indexSubset=function(TEST,v1,v2,v3,v4,v5){
   return(res)
 }
 
+Misclassified <- function(Tar,P){
+  l<-length(Tar)
+  col<-c()
+  for (i in 1:l){
+    if(Tar[i]!=P[i]){
+      col<-c(col,i)
+    }
+  }
+  return(col)
+}
+DistVarNum=function(var,tes){
+  vector=tes[,var]
+  testmean <- mean(vector)
+  testmedian <- median(vector)
+  testvariance <- var(vector)
+  clData=data.frame()
+  clData=rbind(clData,testmean,testmedian,testvariance)
+  row.names(clData)=c("Mean","Median","Variance")
+  return(clData)
+}
+DistVarCat=function(var,tes){
+  vector=tes[,var]
+  clData=data.frame()
+  for(i in 1:length(unique(vector))){
+    clData=rbind(clData, sum(vector == unique(vector)[i])/length(vector)*100)
+  }
+  row.names(clData)=c(unique(vector))
+  return(clData)
+}
+DistVarPred <- function(var,tes){
+  l=length(unique(tes[,var]))
+  if (l>8){
+    dt=DistVarNum(var,tes)
+  }
+  else{
+    dt=DistVarCat(var,tes)
+  }
+  return(dt)
+}
+Uni_Table <- function(var,tes1,tes2,tes3){
+  a<-DistVarPred(var,tes1)
+  b<-DistVarPred(var,tes2)
+  c<-DistVarPred(var,tes3)
+  d<-cbind.fill(a,b,c,fill=0)
+  d<-data.frame(d)
+  row.names(d)=row.names(c)
+  colnames(d)=c("NN","LR","Distribution")
+  return(d)
+}
+
 # setting of directory
-#path <- "C:/Users/Marina/Documents/Semestre 9 (2018-2019)/Pi²/Pi2-Transparence-des-algorithmes-AlessandroBusato-patch-1"
-#setwd(path)
+path <- "/Users/alessandrobusato/Desktop/ESILV/Project/Pi2-Transparence-des-algorithmes-master"
+setwd(path)
 
 # import the data: sample_test(the same that we use for app1)
 #                  result( fake data)
