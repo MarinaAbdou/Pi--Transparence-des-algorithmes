@@ -43,42 +43,15 @@ GoodWrong <- function(Tar,P1,P2){
   ng=ng/l
   
   dt=data.frame("Observations"=c(l),
-                "Correct"=c(g),
-                "Correct only for DTree"=c(g1),
-                "Correct only for LReg"=c(g2),
-                "Wrong"=c(ng)
+                "Correct"=c(g*100),
+                "Correct only for Model 1"=c(g1*100),
+                "Correct only for Model 2"=c(g2*100),
+                "Wrong"=c(ng*100)
+    
   )
   return(dt)
 }
-nGoodWrong<- function(Tar,P1,P2){
-  g=0
-  g1=0
-  g2=0
-  ng=0
-  l=length(Tar)
-  if(l>0){
-    for (i in 1:l){
-      if(Tar[i]==P1[i] &Tar[i]==P2[i] ){
-        g=g+1
-      }
-      else if(Tar[i]==P1[i] &Tar[i]!=P2[i] ){
-        g1=g1+1
-      }
-      else if(Tar[i]!=P1[i] &Tar[i]==P2[i] ){
-        g2=g2+1
-      }
-      else {
-        ng=ng+1
-      }
-    }
-  }
-  dt=data.frame("GOOD PREDICTION BOTH MODELS"=c(g),
-                "GOOD PREDICTION ONLY 1"=c(g1),
-                "GOOD PREDICTION ONLY 2"=c(g2),
-                "BOTH WRONG PRED"=c(ng)
-  )
-  return(dt)
-}
+
 PercGoodWrong2<- function(Tar,P1,P2){
   g=0
   g1=0
@@ -103,10 +76,10 @@ PercGoodWrong2<- function(Tar,P1,P2){
   }
   dt=data.frame("Observations"=c(l),
                 "Correct"=c(100*g/l),
-                "Correct only for DTree"=c(100*g1/l),
-                "Correct only for LReg"=c(100*g2/l),
+                "Correct only for Model 1"=c(100*g1/l),
+                "Correct only for Model 2"=c(100*g2/l),
                 "Wrong"=c(100*ng/l)
-  )
+                )
   return(dt)
 }
 clustIndCat=function(vect){
@@ -227,13 +200,13 @@ Uni_Table <- function(var,tes1,tes2,tes3){
   d<-cbind.fill(a,b,c,fill=0)
   d<-data.frame(d)
   row.names(d)=row.names(c)
-  colnames(d)=c("NN","LR","Distribution")
+  colnames(d)=c("Model 1","Model 2","Distribution")
   return(d)
 }
 
 # setting of directory
-path <- "/Users/alessandrobusato/Desktop/ESILV/Project/Pi2-Transparence-des-algorithmes-master"
-setwd(path)
+#path <- "/Users/alessandrobusato/Desktop/ESILV/Project/Pi2-Transparence-des-algorithmes-master"
+#setwd(path)
 
 # import the data: sample_test(the same that we use for app1)
 #                  result( fake data)
@@ -274,8 +247,8 @@ simdata<- read.csv("simdata.csv", header=TRUE)
 simdata<-as.data.frame(simdata)
 #fake Trainfeat and infoSimof 2 simulation
 trainFeat=data.frame("Level Of Noise"=c(simdata[1]),
-                     "% Data Used"=c(simdata[2]),
-                     "%Var Used"=c(simdata[3]))
+                     "% Data Used"=c(simdata[2]*100),
+                     "%Var Used"=c(simdata[3]*100))
 
 for (i in 1:nSim) {
   r1<-simdata[i,4:5]
@@ -288,11 +261,11 @@ for (i in 1:nSim) {
     precTime<-cbind(precTime,simi)
   }
 }
-precTime=data.frame(precTime, row.names = c("time","prec"))
+precTime=data.frame(precTime, row.names = c("Time","Percentage of good predicitions"))
 col_names<-c()
 for (i in 1:nSim) {
-  col_names<-c(col_names,"NN")
-  col_names<-c(col_names,"LR")
+  col_names<-c(col_names,"Model 1")
+  col_names<-c(col_names,"Model 2")
 }
 colnames(precTime)=col_names
 
