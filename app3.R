@@ -34,7 +34,7 @@ ui <- fluidPage(
  
  sidebarLayout(
    sidebarPanel(
-     selectInput("noise","Noise level",c("No noise"=1,"Low"=2,"Medium"=3,"High"=4,"NoiseG"=5),selected = 1),
+     selectInput("noise","Noise level",c("No noise"=1,"Low Gaussian"=2,"Medium Gaussian"=3,"High Gaussian"=4,"Bernouilli"=5),selected = 1),
      selectInput("ni", "Feature to visualize",
                  c("% good predictions"=1,
                    "AUC"=2,
@@ -147,7 +147,7 @@ ui <- fluidPage(
  
  sidebarLayout(
    sidebarPanel(
-     selectInput("dn","Noise level",c("No noise"=1,"Low"=2,"Medium"=3,"High"=4,"NoiseG"=5),selected = 1),
+     selectInput("dn","Noise level",c("No noise"=1,"Low Gaussian"=2,"Medium Gaussian"=3,"High Gaussian"=4,"Bernouilli"=5),selected = 1),
      selectInput("dv","Variables percentage",c("20%"=1,"40%"=2,"60%"=3,"80%"=4,"100%"=5),selected=5),
      selectInput("di2", "Feature to visualize",
                  c("% good predictions"=1,
@@ -169,7 +169,7 @@ ui <- fluidPage(
  
  sidebarLayout(
    sidebarPanel(
-     selectInput("vn","Noise level",c("No noise"=1,"Low"=2,"Medium"=3,"High"=4,"NoiseG"=5),selected = 1),
+     selectInput("vn","Noise level",c("No noise"=1,"Low Gaussian"=2,"Medium Gaussian"=3,"High Gaussian"=4,"Bernouilli"=5),selected = 1),
      selectInput("vd","Observations percentage",c("20%"=1,"40%"=2,"60%"=3,"80%"=4,"100%"=5),selected=5),
      selectInput("vi2", "Feature to visualize",
                  c("% good predictions"=1,
@@ -237,16 +237,28 @@ caption.width = getOption("xtable.caption.width", NULL)
 )
   
   output$td1=renderTable({
-    tabToPlotD(d(),totData[[di()]][[1]])}, rownames = TRUE
+    tabToPlotD(d(),totData[[di()]][[1]])}, rownames = TRUE,
+    caption = "% of observations used (vertical) , % of variables used (horizontal)",
+    caption.placement = getOption("xtable.caption.placement", "bottom"), 
+    caption.width = getOption("xtable.caption.width", NULL)
   )
   output$td2=renderTable({
-    tabToPlotD(d(),totData[[di()]][[2]])}, rownames = TRUE
+    tabToPlotD(d(),totData[[di()]][[2]])}, rownames = TRUE,
+    caption = "% of observations used (vertical) , % of variables used (horizontal)",
+    caption.placement = getOption("xtable.caption.placement", "bottom"), 
+    caption.width = getOption("xtable.caption.width", NULL)
     )
   output$tv1=renderTable({
-    tabToPlotV(v(),totData[[vi()]][[1]])}, rownames = TRUE
+    tabToPlotV(v(),totData[[vi()]][[1]])}, rownames = TRUE,
+    caption = "% of observations used (vertical) , % of variables used (horizontal)",
+    caption.placement = getOption("xtable.caption.placement", "bottom"), 
+    caption.width = getOption("xtable.caption.width", NULL)
     )
   output$tv2=renderTable({
-    tabToPlotV(v(),totData[[vi()]][[2]])}, rownames = TRUE
+    tabToPlotV(v(),totData[[vi()]][[2]])}, rownames = TRUE,
+    caption = "% of observations used (vertical) , % of variables used (horizontal)",
+    caption.placement = getOption("xtable.caption.placement", "bottom"), 
+    caption.width = getOption("xtable.caption.width", NULL)
   )
   
   
