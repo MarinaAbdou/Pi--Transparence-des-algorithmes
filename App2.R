@@ -1,5 +1,7 @@
-path <- "/Users/alessandrobusato/Desktop/ESILV/Project/Pi2-Transparence-des-algorithmes-master"
-setwd(path)
+#path <- "C:/Users/Marina/Documents/Semestre 9 (2018-2019)/Pi²/Pi2-Transparence-des-algorithmes-master"
+#setwd(path)
+
+#install.packages("shinythemes")
 library(shinythemes)
 
 source("App2_Settings.R")
@@ -94,8 +96,13 @@ ui <- fluidPage(
   fluidRow(tableOutput("Misobs")),
   
   hr(),
+  
+  h3("Changing of the prediction with the change of two variables"),
+  
+  hr(),
+  
   fluidRow(align = "center",
-           h3("Changing of the prediction with the change of two variables"),
+           
            column(5,
                   h5("Neural Network, Numeric Var"),
                   plotlyOutput("heatmap", width = "100%", height="500px")),
@@ -195,7 +202,7 @@ server <- function(input, output){
     par(new=TRUE)
     plot(perfLR,col="blue")
     abline(0,1)
-    legend("topleft", legend=c("Neural Network", "Logistic Regression"),
+    legend("topleft", legend=c("Model 1", "Model 2"),
            col=c("red", "blue"), lty=1:1, cex=0.8)
   })
   
@@ -205,10 +212,10 @@ server <- function(input, output){
                      GW_glob[v$idSim*5],
                      GW_glob[v$idSim*5-1])), 
         
-        labels =c(paste("Correctly classified : \n",round(GW_glob[v$idSim*5-3]*100,0),"%"),
-                  paste("Classified correctly by \n NN ONLY : \n",round(GW_glob[v$idSim*5-2]*100,0),"%"),
-                  paste("Wrongly classified : \n",round(GW_glob[v$idSim*5]*100,0),"%"),
-                  paste("Classified correctly by \n LR ONLY : \n", round(GW_glob[v$idSim*5-1]*100,0),"%")),
+        labels =c(paste("Correctly classified : \n",round(GW_glob[v$idSim*5-3],2),"%"),
+                  paste("Classified correctly by \n Model 1 ONLY : \n",round(GW_glob[v$idSim*5-2],2),"%"),
+                  paste("Wrongly classified : \n",round(GW_glob[v$idSim*5],2),"%"),
+                  paste("Classified correctly by \n Model 2 ONLY : \n", round(GW_glob[v$idSim*5-1],2),"%")),
         
         main = "Generic Classification Pie Chart",
         col = c("#87CEFA","#BAB1B1","#AD1D28","#BAB1B1"))
@@ -234,10 +241,10 @@ server <- function(input, output){
                      GWSub[5],
                      GWSub[4])), 
         
-        labels =c(paste("Correctly classified : \n",round(GWSub[2]*100,0),"%"),
-                  paste("Classified correctly by \n Neural Network ONLY : \n",round(GWSub[3]*100,0),"%"),
-                  paste("Wrongly classified : \n",round(GWSub[5]*100,0),"%"),
-                  paste("Classified correctly by \n Logistic Regression ONLY : \n", round(GWSub[4]*100,0),"%")),
+        labels =c(paste("Correctly classified : \n",round(GWSub[2],2),"%"),
+                  paste("Classified correctly by \n Model 1 ONLY : \n",round(GWSub[3],2),"%"),
+                  paste("Wrongly classified : \n",round(GWSub[5],2),"%"),
+                  paste("Classified correctly by \n Model 2 ONLY : \n", round(GWSub[4],2),"%")),
         
         main = "Subset Classification Pie Chart",
         col = c("#87CEFA","#BAB1B1","#AD1D28","#BAB1B1"))
@@ -251,7 +258,7 @@ server <- function(input, output){
       par(new=TRUE)
       plot(perfLR,col="blue")
       abline(0,1)
-      legend("topleft", legend=c("Neural Networks", "Logistic Regression"),
+      legend("topleft", legend=c("Model 1", "Model 2"),
              col=c("red", "blue"), lty=1:1, cex=0.8)
     }
   })
